@@ -5,10 +5,10 @@ from typing import Any
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
-from astroquery_mcp.models.errors import MCPError, ErrorCode
-from astroquery_mcp.retry import run_sync_with_retry
-from astroquery_mcp.utils.coord_utils import validate_coordinates
-from astroquery_mcp.utils.table_utils import table_to_records
+from models.errors import MCPError, ErrorCode
+from retry import run_sync_with_retry
+from utils.coord_utils import validate_coordinates
+from utils.table_utils import table_to_records
 
 
 def list_catalogs(filter: str | None = None) -> dict[str, Any]:

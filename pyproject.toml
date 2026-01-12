@@ -5,13 +5,14 @@ description = "MCP server for astronomical data queries via astroquery"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "astropy>=7.2.0",
     "astroquery>=0.4",
     "fastmcp>=2.14.2",
     "mcp>=1.25.0",
 ]
 
 [project.scripts]
-astroquery-mcp = "astroquery_mcp.server:main"
+astroquery-mcp = "server:main"
 
 [tool.fastmcp]
 name = "astroquery-mcp"

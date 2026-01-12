@@ -8,9 +8,9 @@ from astropy.table import Table
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-from astroquery_mcp.introspection import ASTROQUERY_MODULES, discover_all_functions
-from astroquery_mcp.utils.table_utils import table_to_dict
-from astroquery_mcp.models.errors import MCPError, ErrorCode
+from introspection import ASTROQUERY_MODULES, discover_all_functions
+from utils.table_utils import table_to_dict
+from models.errors import MCPError, ErrorCode
 
 logger = logging.getLogger(__name__)
 

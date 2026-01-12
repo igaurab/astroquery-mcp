@@ -1,7 +1,7 @@
 """Pydantic models for astroquery MCP server."""
 
-from astroquery_mcp.models.errors import MCPError, ErrorCode
-from astroquery_mcp.models.results import (
+from models.errors import MCPError, ErrorCode
+from models.results import (
     ServiceInfo,
     ToolSignature,
     CoordinateResult,

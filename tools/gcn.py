@@ -3,8 +3,8 @@
 import re
 from typing import Any
 
-from astroquery_mcp.http_client import fetch_json, fetch_text
-from astroquery_mcp.models.errors import MCPError, ErrorCode
+from http_client import fetch_json, fetch_text
+from models.errors import MCPError, ErrorCode
 
 
 # GCN API base URL
@@ -262,7 +262,7 @@ async def crossmatch_vo(localization: dict) -> dict[str, Any]:
     Returns:
         Crossmatched sources.
     """
-    from astroquery_mcp.tools.simbad import query_region as simbad_query_region
+    from tools.simbad import query_region as simbad_query_region
 
     if not localization:
         raise MCPError(

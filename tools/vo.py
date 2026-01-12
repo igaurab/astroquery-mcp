@@ -2,11 +2,11 @@
 
 from typing import Any
 
-from astroquery_mcp.config import get_config
-from astroquery_mcp.models.errors import MCPError, ErrorCode
-from astroquery_mcp.retry import run_sync_with_retry
-from astroquery_mcp.utils.table_utils import table_to_records
-from astroquery_mcp.utils.coord_utils import validate_coordinates
+from config import get_config
+from models.errors import MCPError, ErrorCode
+from retry import run_sync_with_retry
+from utils.table_utils import table_to_records
+from utils.coord_utils import validate_coordinates
 
 
 def _resolve_service_url(service_url: str, service_type: str = "tap") -> str:

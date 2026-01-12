@@ -14,8 +14,8 @@ from tenacity import (
     RetryError,
 )
 
-from astroquery_mcp.config import get_config
-from astroquery_mcp.models.errors import MCPError, ErrorCode
+from config import get_config
+from models.errors import MCPError, ErrorCode
 
 logger = logging.getLogger(__name__)
 

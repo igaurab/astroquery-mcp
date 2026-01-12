@@ -5,9 +5,9 @@ from typing import Any
 
 import httpx
 
-from astroquery_mcp.config import get_config
-from astroquery_mcp.models.errors import MCPError, ErrorCode
-from astroquery_mcp.retry import with_retry
+from config import get_config
+from models.errors import MCPError, ErrorCode
+from retry import with_retry
 
 logger = logging.getLogger(__name__)
 

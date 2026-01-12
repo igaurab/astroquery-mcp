@@ -5,14 +5,14 @@ from typing import Any
 
 from fastmcp import FastMCP
 
-from astroquery_mcp.auth import configure_astroquery_auth
-from astroquery_mcp.executor import (
+from auth import configure_astroquery_auth
+from executor import (
     execute_function,
     list_modules,
     list_functions,
     get_function_info,
 )
-from astroquery_mcp.models.errors import MCPError
+from models.errors import MCPError
 
 # Configure logging
 logging.basicConfig(

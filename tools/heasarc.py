@@ -5,11 +5,11 @@ from typing import Any
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
-from astroquery_mcp.config import get_config
-from astroquery_mcp.models.errors import MCPError, ErrorCode
-from astroquery_mcp.retry import run_sync_with_retry
-from astroquery_mcp.utils.coord_utils import validate_coordinates
-from astroquery_mcp.utils.table_utils import table_to_records
+from config import get_config
+from models.errors import MCPError, ErrorCode
+from retry import run_sync_with_retry
+from utils.coord_utils import validate_coordinates
+from utils.table_utils import table_to_records
 
 
 def list_catalogs(master: bool = True) -> dict[str, Any]:
@@ -198,7 +198,7 @@ def query_tap(query: str) -> dict[str, Any]:
     Returns:
         Query results.
     """
-    from astroquery_mcp.tools.vo import tap_query
+    from tools.vo import tap_query
 
     return tap_query("heasarc", query)
 

@@ -179,7 +179,7 @@ def sort_by_separation(
     Returns:
         Table sorted by separation (closest first).
     """
-    from astroquery_mcp.utils.coord_utils import angular_separation
+    from utils.coord_utils import angular_separation
 
     if ra_col not in table.colnames or dec_col not in table.colnames:
         return table

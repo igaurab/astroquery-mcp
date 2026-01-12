@@ -3,8 +3,8 @@
 import os
 from typing import Any
 
-from astroquery_mcp.config import get_config
-from astroquery_mcp.models.errors import MCPError, ErrorCode
+from config import get_config
+from models.errors import MCPError, ErrorCode
 
 
 def get_token(service: str) -> str | None:

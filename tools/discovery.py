@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from astroquery_mcp.models.results import ServiceInfo, ToolSignature, ToolParameter
+from models.results import ServiceInfo, ToolSignature, ToolParameter
 
 # Service definitions
 SERVICES: dict[str, ServiceInfo] = {
@@ -1062,7 +1062,7 @@ def get_service_status(service: str) -> dict[str, Any]:
     Returns:
         Status dictionary with availability info.
     """
-    from astroquery_mcp.auth import check_auth_status
+    from auth import check_auth_status
 
     if service not in SERVICES:
         return {"available": False, "error": f"Unknown service: {service}"}

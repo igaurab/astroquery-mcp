@@ -2,10 +2,10 @@
 
 from typing import Any
 
-from astroquery_mcp.auth import require_token
-from astroquery_mcp.config import get_config
-from astroquery_mcp.models.errors import MCPError, ErrorCode
-from astroquery_mcp.retry import run_sync_with_retry
+from auth import require_token
+from config import get_config
+from models.errors import MCPError, ErrorCode
+from retry import run_sync_with_retry
 
 
 # Default fields to retrieve

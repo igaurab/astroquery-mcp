@@ -5,7 +5,7 @@ from typing import Any
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
-from astroquery_mcp.models.errors import MCPError, ErrorCode
+from models.errors import MCPError, ErrorCode
 
 
 def parse_coordinates(
