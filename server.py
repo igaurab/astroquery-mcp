@@ -161,9 +161,8 @@ def main():
     available = [m["name"] for m in modules["modules"] if m["available"]]
     logger.info(f"Available modules: {available}")
 
-    # Run the server
-    # mcp.run()
-    mcp.run(transport="http", host="127.0.0.1", port=8000)
+    # Run the server (uses stdio by default for fastmcp deploy compatibility)
+    mcp.run()
 
 
 

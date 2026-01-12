@@ -1,10 +1,17 @@
 [project]
 name = "astroquery-mcp"
 version = "0.1.0"
-description = "Add your description here"
+description = "MCP server for astronomical data queries via astroquery"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "astroquery>=0.4",
+    "fastmcp>=2.14.2",
     "mcp>=1.25.0",
-    "openai>=2.15.0",
 ]
+
+[project.scripts]
+astroquery-mcp = "astroquery_mcp.server:main"
+
+[tool.fastmcp]
+name = "astroquery-mcp"
