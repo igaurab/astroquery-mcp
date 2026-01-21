@@ -47,7 +47,9 @@ class RateLimitConfig(BaseModel):
 class ResolverConfig(BaseModel):
     """Object resolver configuration."""
 
-    fallback_order: list[str] = Field(default_factory=lambda: ["simbad", "ned", "vizier"])
+    fallback_order: list[str] = Field(
+        default_factory=lambda: ["simbad", "ned", "vizier"]
+    )
 
 
 class SimbadConfig(BaseModel):
@@ -73,7 +75,7 @@ def get_default_config() -> dict[str, Any]:
     return {
         "version": "1.0",
         "auth": {
-            "ads": {"token_env": "ADS_TOKEN"},
+            "ads": {"token_env": "API_DEV_KEY"},
             "mast": {"token_env": "MAST_TOKEN"},
         },
         "endpoints": {

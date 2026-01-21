@@ -4,7 +4,7 @@ import os
 from typing import Any
 
 from config import get_config
-from models.errors import MCPError, ErrorCode
+from models.errors import ErrorCode, MCPError
 
 
 def get_token(service: str) -> str | None:
@@ -42,7 +42,11 @@ def require_token(service: str) -> str:
     if not token:
         config = get_config()
         token_env = config.auth.get(service, {})
-        env_var = token_env.token_env if hasattr(token_env, "token_env") else f"{service.upper()}_TOKEN"
+        env_var = (
+            token_env.token_env
+            if hasattr(token_env, "token_env")
+            else f"{service.upper()}_TOKEN"
+        )
 
         raise MCPError(
             code=ErrorCode.AUTHENTICATION_ERROR,

@@ -277,7 +277,7 @@ fastmcp deploy server.py
 For services requiring authentication:
 
 ```bash
-export ADS_TOKEN="your-ads-token"
+export API_DEV_KEY="your-ads-token"
 export MAST_TOKEN="your-mast-token"
 ```
 
@@ -292,7 +292,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
       "command": "python",
       "args": ["/path/to/server.py"],
       "env": {
-        "ADS_TOKEN": "your-token-here"
+        "API_DEV_KEY": "your-token-here"
       }
     }
   }
