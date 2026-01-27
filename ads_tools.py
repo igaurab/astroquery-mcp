@@ -31,6 +31,7 @@ FIELD_PRESETS = {
         "citation_count",
         "doi",
         "pub",  # Journal/publication
+        "abstract",
     ],
     "extended": [
         "bibcode",
@@ -162,8 +163,8 @@ def query_ads_compact(
         query_string: ADS query string (e.g., "black hole X-ray")
         fields: Field preset name or custom list of fields:
             - "minimal": bibcode, title, first_author, year, citations (5 fields)
-            - "standard": + author list, date, DOI, journal (9 fields)
-            - "extended": + volume, page, keywords, abstract (13 fields)
+            - "standard": + author list, date, DOI, journal, abstract (10 fields)
+            - "extended": + volume, page, keywords (13 fields)
             - "full": All fields (may use lots of tokens)
             - Custom list: ["bibcode", "title", "year", ...]
         max_results: Maximum results to return (default: 10)
