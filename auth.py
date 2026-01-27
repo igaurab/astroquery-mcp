@@ -16,13 +16,30 @@ def get_token(service: str) -> str | None:
     Returns:
         Token string or None if not configured.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+
     config = get_config()
 
     if service not in config.auth:
+        logger.warning(f"Service {service} not found in auth config")
         return None
 
     token_env = config.auth[service].token_env
-    return os.environ.get(token_env)
+    token = os.environ.get(token_env)
+
+    # Debug logging
+    logger.info(f"Looking for token in env var: {token_env}")
+    logger.info(f"Token found: {bool(token)}")
+    if token:
+        logger.info(f"Token length: {len(token)}")
+    else:
+        logger.warning(f"Environment variable {token_env} is not set or is empty")
+        # List all env vars that start with API or ADS for debugging
+        relevant_vars = {k: v[:10] + "..." if v else None for k, v in os.environ.items() if k.startswith(("API", "ADS"))}
+        logger.info(f"Available API/ADS env vars: {relevant_vars}")
+
+    return token
 
 
 def require_token(service: str) -> str:
