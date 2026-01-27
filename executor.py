@@ -183,6 +183,20 @@ def execute_function(
     params = params or {}
 
     try:
+        # Configure authentication on-demand for services that need it
+        if module_name in ("ads", "mast", "mast_catalogs"):
+            import os
+            from auth import configure_astroquery_auth
+
+            logger.info(f"=== AUTH DEBUG for {module_name} ===")
+            logger.info(f"API_DEV_KEY env var present: {bool(os.environ.get('API_DEV_KEY'))}")
+            if os.environ.get('API_DEV_KEY'):
+                logger.info(f"API_DEV_KEY length: {len(os.environ.get('API_DEV_KEY'))}")
+
+            auth_status = configure_astroquery_auth()
+            logger.info(f"Auth configuration result: {auth_status}")
+            logger.info(f"=== END AUTH DEBUG ===")
+
         # Get the class/instance
         cls = get_class_instance(module_name)
 

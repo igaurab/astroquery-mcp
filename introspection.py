@@ -32,10 +32,35 @@ SKIP_METHODS = {
     "_request", "_parse_result", "_args_to_payload",
 }
 
+# Special methods to always include (authentication, help, etc.)
+ALWAYS_INCLUDE_METHODS = {
+    "login", "logout", "login_gui", "authenticated", "auth",
+    "help", "help_tap",
+}
+
 # Methods that are typically useful query methods
 QUERY_METHOD_PREFIXES = (
+    # Core query methods
     "query_", "get_", "list_", "search_", "download_",
     "fetch_", "resolve_", "cone_search", "locate_",
+
+    # Configuration & cache management (10 modules)
+    "clear_", "reset_",
+
+    # GAIA TAP/async workflows
+    "launch_", "load_", "save_", "upload_",
+
+    # Advanced analysis & filtering
+    "cross_", "filter_",
+
+    # Feature toggling & resource management
+    "enable_", "disable_", "delete_", "remove_", "rename_",
+
+    # Collaboration
+    "share_",
+
+    # Discovery & configuration
+    "add_", "find_",
 )
 
 
@@ -140,12 +165,14 @@ def introspect_class(module_name: str, class_path: str) -> list[FunctionInfo]:
             if method is None or not callable(method):
                 continue
 
-            # Focus on query-like methods
-            if not any(method_name.startswith(p) or method_name == p.rstrip("_")
-                      for p in QUERY_METHOD_PREFIXES):
-                # Also include if it's a classmethod/staticmethod that looks useful
-                if not isinstance(inspect.getattr_static(cls, method_name), (classmethod, staticmethod)):
-                    continue
+            # Focus on query-like methods and special methods
+            matches_prefix = any(method_name.startswith(p) or method_name == p.rstrip("_")
+                               for p in QUERY_METHOD_PREFIXES)
+            is_special_method = method_name in ALWAYS_INCLUDE_METHODS
+            is_useful_classmethod = isinstance(inspect.getattr_static(cls, method_name), (classmethod, staticmethod))
+
+            if not (matches_prefix or is_special_method or is_useful_classmethod):
+                continue
 
             # Extract function info
             try:

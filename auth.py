@@ -28,16 +28,16 @@ def get_token(service: str) -> str | None:
     token_env = config.auth[service].token_env
     token = os.environ.get(token_env)
 
-    # Debug logging
-    logger.info(f"Looking for token in env var: {token_env}")
-    logger.info(f"Token found: {bool(token)}")
+    # Debug logging (always log, not just debug level)
+    logger.info(f"[get_token] Looking for token in env var: {token_env}")
+    logger.info(f"[get_token] Token found: {bool(token)}")
     if token:
-        logger.info(f"Token length: {len(token)}")
+        logger.info(f"[get_token] Token length: {len(token)}")
     else:
-        logger.warning(f"Environment variable {token_env} is not set or is empty")
+        logger.warning(f"[get_token] Environment variable {token_env} is not set or is empty")
         # List all env vars that start with API or ADS for debugging
         relevant_vars = {k: v[:10] + "..." if v else None for k, v in os.environ.items() if k.startswith(("API", "ADS"))}
-        logger.info(f"Available API/ADS env vars: {relevant_vars}")
+        logger.warning(f"[get_token] Available API/ADS env vars: {relevant_vars}")
 
     return token
 
@@ -83,20 +83,39 @@ def configure_astroquery_auth() -> dict[str, Any]:
     Returns:
         Dict of configured services and their status.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+
     configured = {}
+
+    logger.info("[configure_auth] Starting authentication configuration")
 
     # Configure ADS token
     ads_token = get_token("ads")
+    logger.info(f"[configure_auth] ADS token retrieved: {bool(ads_token)}")
+
     if ads_token:
         try:
             from astroquery.nasa_ads import ADS
 
+            # Set both the class attribute AND ensure env var is set
+            # (ADS module checks environment variable directly in some cases)
             ADS.TOKEN = ads_token
+            os.environ["API_DEV_KEY"] = ads_token
+
             configured["ads"] = True
-        except ImportError:
+            logger.info("[configure_auth] ✓ ADS authentication configured successfully")
+            logger.info(f"[configure_auth] ADS.TOKEN is now: {ADS.TOKEN[:10]}...")
+            logger.info(f"[configure_auth] API_DEV_KEY env var is now: {os.environ['API_DEV_KEY'][:10]}...")
+        except ImportError as e:
             configured["ads"] = False
+            logger.error(f"[configure_auth] ✗ Failed to import ADS module: {e}")
+    else:
+        configured["ads"] = False
+        logger.warning("[configure_auth] ✗ ADS token not found in environment")
 
     # Configure MAST token (optional)
+    logger.info("[configure_auth] Checking MAST token...")
     mast_token = get_token("mast")
     if mast_token:
         try:
@@ -104,9 +123,14 @@ def configure_astroquery_auth() -> dict[str, Any]:
 
             Observations.login(token=mast_token)
             configured["mast"] = True
-        except (ImportError, Exception):
+            logger.info("[configure_auth] ✓ MAST authentication configured successfully")
+        except (ImportError, Exception) as e:
             configured["mast"] = False
+            logger.warning(f"[configure_auth] ✗ MAST configuration failed: {e}")
+    else:
+        logger.info("[configure_auth] MAST token not provided (optional)")
 
+    logger.info(f"[configure_auth] Final configuration: {configured}")
     return configured
 
 
