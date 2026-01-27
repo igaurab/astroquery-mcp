@@ -24,6 +24,9 @@ ASTROQUERY_MODULES = {
     "alma": "astroquery.alma.Alma",
     "esa_hubble": "astroquery.esa.hubble.ESAHubble",
     "esa_jwst": "astroquery.esa.jwst.Jwst",
+    "xmm_newton": "astroquery.esa.xmm_newton.XMMNewton",
+    # Astropy coordinates (commonly used with astroquery)
+    "coordinates": "astropy.coordinates.SkyCoord",
 }
 
 # Methods to skip (internal/private)

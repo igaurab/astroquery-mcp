@@ -26,8 +26,16 @@ mcp = FastMCP(
     "astroquery-mcp",
     instructions="""MCP server for astronomical data queries via astroquery.
 
+## Coordinates (COMMONLY USED)
+Astronomical coordinate operations via SkyCoord:
+- Resolve names: execute("coordinates", "from_name", {"name": "M31"})
+- Get constellation: execute("coordinates", "get_constellation", ...)
+- Search nearby: execute("coordinates", "search_around_sky", ...)
+
+Returns rich coordinate data: RA/Dec (deg + HMS/DMS), Galactic, multiple frames
+
 ## ADS Queries (RECOMMENDED)
-For ADS queries, use optimized tools that reduce token usage by 60-75%:
+Optimized ADS queries that reduce token usage by 60-75%:
 - `ads_query_compact()` - Search ADS with compact results (3-4k vs 12k tokens)
 - `ads_get_paper()` - Get full details for a specific bibcode
 
@@ -37,7 +45,7 @@ Example ADS workflow:
 3. ads_get_paper(bibcode, include_abstract=True)
 
 ## Generic Queries
-Use these for other services or advanced ADS queries:
+Use these for other services or advanced queries:
 - `list_modules()` - See available services (SIMBAD, ADS, MAST, etc.)
 - `list_functions()` - See what functions a module provides
 - `get_function_info()` - Get detailed parameter info for a function

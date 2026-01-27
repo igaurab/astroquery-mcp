@@ -134,13 +134,31 @@ def serialize_result(result: Any) -> Any:
     if isinstance(result, list) and result and isinstance(result[0], Table):
         return [table_to_dict(t) for t in result]
 
-    # SkyCoord
+    # SkyCoord - provide rich output with multiple formats
     if isinstance(result, SkyCoord):
-        return {
-            "ra_deg": result.ra.deg,
-            "dec_deg": result.dec.deg,
-            "frame": result.frame.name,
-        }
+        # Handle both single coordinates and arrays
+        if result.isscalar:
+            return {
+                "ra_deg": float(result.ra.deg),
+                "dec_deg": float(result.dec.deg),
+                "ra_hms": result.ra.to_string(unit=u.hour, sep="hms", precision=2),
+                "dec_dms": result.dec.to_string(unit=u.deg, sep="dms", precision=1),
+                "frame": result.frame.name,
+                "galactic": {
+                    "l": float(result.galactic.l.deg),
+                    "b": float(result.galactic.b.deg),
+                },
+                "hmsdms": result.to_string("hmsdms"),
+                "decimal": result.to_string("decimal", precision=4),
+            }
+        else:
+            # Array of coordinates
+            return {
+                "count": len(result),
+                "ra_deg": result.ra.deg.tolist(),
+                "dec_deg": result.dec.deg.tolist(),
+                "frame": result.frame.name,
+            }
 
     # Astropy Quantity
     if hasattr(result, "value") and hasattr(result, "unit"):
