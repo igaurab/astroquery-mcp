@@ -39,6 +39,16 @@ Example workflow:
 """,
 )
 
+# Configure authentication at module import time (for fastmcp cloud compatibility)
+logger.info("Configuring astroquery authentication...")
+auth_status = configure_astroquery_auth()
+logger.info(f"Auth configured: {auth_status}")
+
+# Log discovered modules
+modules = list_modules()
+available = [m["name"] for m in modules["modules"] if m["available"]]
+logger.info(f"Available modules: {available}")
+
 
 def handle_error(e: Exception) -> dict[str, Any]:
     """Convert exception to error response."""
@@ -105,6 +115,45 @@ def astroquery_get_function_info(module_name: str, function_name: str) -> dict[s
 
 
 @mcp.tool()
+def astroquery_check_auth() -> dict[str, Any]:
+    """Check authentication status for all services.
+
+    Returns diagnostic information about which services are authenticated,
+    which environment variables are set, and any issues detected.
+
+    Returns:
+        Dict with authentication status for each service.
+    """
+    import os
+    from auth import check_auth_status, configure_astroquery_auth
+
+    try:
+        # Re-configure auth to pick up any new environment variables
+        auth_config = configure_astroquery_auth()
+
+        # Get current status
+        status = check_auth_status()
+
+        # Add diagnostic info
+        result = {
+            "status": status,
+            "configured": auth_config,
+            "diagnostics": {
+                "API_DEV_KEY": "set" if os.environ.get("API_DEV_KEY") else "not set",
+                "MAST_TOKEN": "set" if os.environ.get("MAST_TOKEN") else "not set",
+            }
+        }
+
+        # Check if ADS token is accessible
+        if os.environ.get("API_DEV_KEY"):
+            result["diagnostics"]["API_DEV_KEY_length"] = len(os.environ.get("API_DEV_KEY", ""))
+
+        return result
+    except Exception as e:
+        return handle_error(e)
+
+
+@mcp.tool()
 def astroquery_execute(
     module_name: str,
     function_name: str,
@@ -152,15 +201,7 @@ def astroquery_execute(
 
 def main():
     """Main entry point for the MCP server."""
-    # Configure astroquery auth on startup
-    auth_status = configure_astroquery_auth()
-    logger.info(f"Auth configured: {auth_status}")
-
-    # Log discovered modules
-    modules = list_modules()
-    available = [m["name"] for m in modules["modules"] if m["available"]]
-    logger.info(f"Available modules: {available}")
-
+    # Auth is configured at module import time (see above)
     # Run the server (uses stdio by default for fastmcp deploy compatibility)
     mcp.run()
 
