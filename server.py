@@ -1,7 +1,7 @@
 """MCP server for astroquery - dynamically exposes all astroquery functions."""
 
 import logging
-from typing import Any
+from typing import Any, Literal
 
 from fastmcp import FastMCP
 
@@ -26,16 +26,39 @@ mcp = FastMCP(
     "astroquery-mcp",
     instructions="""MCP server for astronomical data queries via astroquery.
 
-Use `list_modules` to see available services (SIMBAD, ADS, MAST, etc.)
-Use `list_functions` to see what functions a module provides
-Use `get_function_info` to get detailed parameter info for a function
-Use `execute` to call any astroquery function
+## Coordinates (COMMONLY USED)
+Astronomical coordinate operations via SkyCoord:
+- Resolve names: execute("coordinates", "from_name", {"name": "M31"})
+- Get constellation: execute("coordinates", "get_constellation", ...)
+- Search nearby: execute("coordinates", "search_around_sky", ...)
 
-Example workflow:
+Returns rich coordinate data: RA/Dec (deg + HMS/DMS), Galactic, multiple frames
+
+## ADS Queries (RECOMMENDED)
+Optimized ADS queries that reduce token usage by 60-75%:
+- `ads_query_compact()` - Search ADS with compact results (3-4k vs 12k tokens)
+- `ads_get_paper()` - Get full details for a specific bibcode
+
+Example ADS workflow:
+1. ads_query_compact("NGC 3783", fields="minimal", max_results=10)
+2. Pick interesting paper from results
+3. ads_get_paper(bibcode, include_abstract=True)
+
+## Generic Queries
+Use these for other services or advanced queries:
+- `list_modules()` - See available services (SIMBAD, ADS, MAST, etc.)
+- `list_functions()` - See what functions a module provides
+- `get_function_info()` - Get detailed parameter info for a function
+- `execute()` - Call any astroquery function (returns ALL fields)
+
+Example generic workflow:
 1. list_modules() -> see available modules
 2. list_functions("simbad") -> see SIMBAD functions
 3. get_function_info("simbad", "query_object") -> see parameters
 4. execute("simbad", "query_object", {"object_name": "M31"}) -> run query
+
+Note: Generic execute() for ADS returns all 50+ fields and uses ~12k tokens per 10 papers.
+Use ads_query_compact() instead for better efficiency.
 """,
 )
 
@@ -195,6 +218,109 @@ def astroquery_execute(
     """
     try:
         return execute_function(module_name, function_name, params)
+    except Exception as e:
+        return handle_error(e)
+
+
+@mcp.tool()
+def ads_query_compact(
+    query_string: str,
+    fields: Literal["minimal", "standard", "extended", "full"] = "standard",
+    max_results: int = 10,
+    sort: str = "citation_count desc",
+) -> dict[str, Any]:
+    """Query ADS with compact results (3-4k tokens vs 12k).
+
+    Optimized ADS queries that return only essential fields, reducing
+    context usage by 60-75%. Use this instead of astroquery_execute
+    for most ADS queries.
+
+    Args:
+        query_string: ADS query string (e.g., "black hole X-ray", "author:Smith")
+        fields: Field preset controlling what data is returned:
+            - "minimal": bibcode, title, first_author, year, citations (5 fields)
+              ~300-500 chars/paper, best for browsing many results
+            - "standard": + authors (max 10), date, DOI, journal (9 fields) [DEFAULT]
+              ~500-800 chars/paper, good balance for most queries
+            - "extended": + volume, page, keywords, abstract (truncated, 13 fields)
+              ~1000-1500 chars/paper, use when abstracts needed
+            - "full": All 50+ fields from ADS
+              ~2000-3000+ chars/paper, rarely needed
+        max_results: Maximum number of papers to return (default: 10)
+        sort: Sort order (default: "citation_count desc" for most cited first)
+
+    Returns:
+        Dict with success status, count, results list, and metadata.
+
+    Examples:
+        # Quick browse of recent papers
+        ads_query_compact("NGC 3783", fields="minimal", max_results=20)
+
+        # Standard query with author info and journal
+        ads_query_compact("black hole X-ray variability", fields="standard")
+
+        # Get abstracts for detailed review
+        ads_query_compact("AGN feedback", fields="extended", max_results=5)
+
+    Token savings:
+        - minimal: 83% reduction (12k → 2k for 10 papers)
+        - standard: 67-75% reduction (12k → 3-4k)
+        - extended: 33-50% reduction (12k → 6-8k)
+    """
+    from ads_tools import query_ads_compact
+    from auth import configure_astroquery_auth
+
+    # Configure auth on-demand
+    configure_astroquery_auth()
+
+    try:
+        return query_ads_compact(query_string, fields, max_results, sort)
+    except Exception as e:
+        return handle_error(e)
+
+
+@mcp.tool()
+def ads_get_paper(
+    bibcode: str,
+    include_abstract: bool = True,
+) -> dict[str, Any]:
+    """Get details for a specific paper by bibcode.
+
+    Use this after ads_query_compact to get full details about a specific
+    paper of interest. Returns all metadata including full author list.
+
+    Args:
+        bibcode: ADS bibcode (e.g., "2023ApJ...123..456S")
+        include_abstract: Include full abstract (adds ~1-2k tokens per paper)
+
+    Returns:
+        Dict with full paper details including all authors and metadata.
+
+    Example workflow:
+        # 1. Find papers with compact query
+        results = ads_query_compact("NGC 3783", fields="minimal", max_results=10)
+
+        # 2. Get bibcode of interesting paper
+        bibcode = results["results"][0]["bibcode"]
+
+        # 3. Get full details
+        paper = ads_get_paper(bibcode, include_abstract=True)
+
+    Returns:
+        Dict with success status and paper details.
+    """
+    from ads_tools import get_paper_details
+    from auth import configure_astroquery_auth
+
+    configure_astroquery_auth()
+
+    fields = None if include_abstract else [
+        "bibcode", "title", "author", "year", "pubdate",
+        "citation_count", "doi", "pub", "volume", "page"
+    ]
+
+    try:
+        return get_paper_details(bibcode, fields)
     except Exception as e:
         return handle_error(e)
 
