@@ -35,7 +35,7 @@ SKIP_METHODS = {
 # Methods that are typically useful query methods
 QUERY_METHOD_PREFIXES = (
     "query_", "get_", "list_", "search_", "download_",
-    "fetch_", "resolve_", "cone_search",
+    "fetch_", "resolve_", "cone_search", "locate_",
 )
 
 
