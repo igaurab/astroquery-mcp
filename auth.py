@@ -28,6 +28,12 @@ def get_token(service: str) -> str | None:
     token_env = config.auth[service].token_env
     token = os.environ.get(token_env)
 
+    # Fallback for ADS: also check ADS_API_KEY if API_DEV_KEY not found
+    if not token and service == "ads" and token_env == "API_DEV_KEY":
+        token = os.environ.get("ADS_API_KEY")
+        if token:
+            logger.info(f"[get_token] Using ADS_API_KEY fallback (preferred is API_DEV_KEY)")
+
     # Debug logging (always log, not just debug level)
     logger.info(f"[get_token] Looking for token in env var: {token_env}")
     logger.info(f"[get_token] Token found: {bool(token)}")
