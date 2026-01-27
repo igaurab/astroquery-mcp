@@ -1,0 +1,17 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
