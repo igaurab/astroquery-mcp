@@ -181,6 +181,7 @@ def astroquery_execute(
     module_name: str,
     function_name: str,
     params: dict[str, Any] | None = None,
+    max_rows: int = 20,
 ) -> dict[str, Any]:
     """Execute any astroquery function.
 
@@ -221,15 +222,22 @@ def astroquery_execute(
 
         if module_name == "mast" and function_name == "query_region":
             result = response.get("result")
-            if isinstance(result, list):
-                result = result[:10]
-
+            if isinstance(result, dict) and "data" in result:
+                total = result.get("row_count", len(result["data"]))
+                truncated = len(result["data"]) > max_rows
+                result = {
+                    **result,
+                    "data": result["data"][:max_rows],
+                    "row_count": min(max_rows, total),
+                    "total_rows": total,
+                    "truncated": truncated,
+                }
             return {
                 "success": response.get("success"),
                 "module": response.get("module"),
                 "function": response.get("function"),
                 "params": response.get("params"),
-                "result": result
+                "result": result,
             }
         return response
 
