@@ -220,7 +220,7 @@ def astroquery_execute(
         response = execute_function(module_name, function_name, params)
 
         if module_name == "mast" and function_name == "query_region":
-            result = response.get("serialized")
+            result = response.get("result")
             if isinstance(result, list):
                 result = result[:10]
 
