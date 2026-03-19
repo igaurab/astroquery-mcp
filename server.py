@@ -217,7 +217,22 @@ def astroquery_execute(
         })
     """
     try:
-        return execute_function(module_name, function_name, params)
+        response = execute_function(module_name, function_name, params)
+
+        if module_name == "mast" and function_name == "query_region":
+            result = response.get("serialized")
+            if isinstance(result, list):
+                result = result[:10]
+
+            return {
+                "success": response.get("success"),
+                "module": response.get("module"),
+                "function": response.get("function"),
+                "params": response.get("params"),
+                "result": result
+            }
+        return response
+
     except Exception as e:
         return handle_error(e)
 
