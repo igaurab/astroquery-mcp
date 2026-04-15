@@ -67,10 +67,11 @@ logger.info("Configuring astroquery authentication...")
 auth_status = configure_astroquery_auth()
 logger.info(f"Auth configured: {auth_status}")
 
-# Log discovered modules
-modules = list_modules()
-available = [m["name"] for m in modules["modules"] if m["available"]]
-logger.info(f"Available modules: {available}")
+# NOTE: Do NOT call list_modules() here. It eagerly imports every astroquery
+# submodule (gaia, heasarc, jwst, xmm_newton, alma, ...) which takes ~60s and
+# exceeds fastmcp.app's Lambda cold-start timeout, causing the server to exit
+# before it can respond to `initialize`. Module imports are done lazily on
+# first use via executor._class_cache.
 
 
 def handle_error(e: Exception) -> dict[str, Any]:

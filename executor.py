@@ -276,17 +276,27 @@ def execute_function(
 def list_modules() -> dict[str, Any]:
     """List available astroquery modules.
 
+    Availability is checked via `importlib.util.find_spec` on the parent
+    module, which is cheap (no heavy import side-effects). Actually loading
+    a module happens lazily on first use in `get_class_instance`.
+
     Returns:
         Dict with module information.
     """
+    import importlib.util
+
     modules = []
     for name, path in ASTROQUERY_MODULES.items():
-        try:
-            # Check if importable
-            get_class_instance(name)
+        # Already cached → definitely available
+        if name in _class_cache:
             available = True
-        except Exception:
-            available = False
+        else:
+            # Check the parent module can be located without importing it
+            parent_path = path.rsplit(".", 1)[0] if "." in path else path
+            try:
+                available = importlib.util.find_spec(parent_path) is not None
+            except (ImportError, ValueError):
+                available = False
 
         modules.append({
             "name": name,
